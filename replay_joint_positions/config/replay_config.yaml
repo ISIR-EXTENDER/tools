@@ -1,0 +1,5 @@
+replay_joint_positions:
+  ros__parameters:
+    input_file: "joint_position.pkl"
+    state_publish_topic: "/replay/joint_states"
+    send_position_topic: "/joint_position_desired"
