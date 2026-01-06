@@ -1,0 +1,5 @@
+image_publisher:
+  ros__parameters:
+    folder_path: ""
+    fps: 100
+    image_extensions: ".jpg,.jpeg,.png,.bmp,.tiff,.tif"
