@@ -1,0 +1,26 @@
+image_width: 640
+image_height: 480
+camera_name: explorer_camera
+camera_matrix:
+  rows: 3
+  cols: 3
+  data: [668.61019,   0.     , 324.58924,
+           0.     , 662.89109, 272.01832,
+           0.     ,   0.     ,   1.     ]
+distortion_model: plumb_bob
+distortion_coefficients:
+  rows: 1
+  cols: 5
+  data: [0.070359, -0.200867, 0.009838, 0.002212, 0.000000]
+rectification_matrix:
+  rows: 3
+  cols: 3
+  data: [1., 0., 0.,
+         0., 1., 0.,
+         0., 0., 1.]
+projection_matrix:
+  rows: 3
+  cols: 4
+  data: [671.41606,   0.     , 325.30635,   0.     ,
+           0.     , 663.91612, 274.72597,   0.     ,
+           0.     ,   0.     ,   1.     ,   0.     ]

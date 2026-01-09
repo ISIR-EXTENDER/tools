@@ -1,0 +1,15 @@
+apriltag_detector:
+  ros__parameters:
+    tag_publisher_topic: "/tag_detections"
+    max_hamming_distance: 1
+    tag_sizes:
+      0: 0.024
+      1: 0.024
+      2: 0.024
+      3: 0.024
+      4: 0.024
+      5: 0.024
+      6: 0.024
+      7: 0.024
+      8: 0.024
+      9: 0.024
