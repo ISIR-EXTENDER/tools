@@ -42,6 +42,27 @@ A message for commanding specific joint positions by name.
 - Joint names must match those defined in the robot's URDF
 - Positions must be within joint limits
 
+### AprilTagPose
+
+A message representing the detected pose of a single AprilTag.
+
+**Fields**:
+
+- **`id`** (`int32`): Unique identifier of the detected AprilTag
+- **`tag_pose`** (`geometry_msgs/Pose`): 3D pose of the tag in the camera frame
+  - `position`: 3D position (x, y, z) in meters
+  - `orientation`: Quaternion (x, y, z, w) representing tag orientation
+
+### AprilTagPoseArray
+
+A collection of detected AprilTag poses.
+
+**Fields**:
+
+- **`detected_tags`** (`extender_msgs/AprilTagPose[]`): Array of detected AprilTags with their poses
+
+**Usage**: Used for publishing results from AprilTag detection pipelines
+
 ## Installation
 
 1. Clone the package into your ROS2 workspace:
