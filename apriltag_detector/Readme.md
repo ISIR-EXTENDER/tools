@@ -4,11 +4,12 @@ A ROS 2 package for detecting AprilTags from camera feed and estimating their po
 
 ## Overview
 
-This package provides a ROS 2 node that:
-- Subscribes to camera image and camera info topics
-- Detects AprilTags (Tag36h11 family) in the image
-- Estimates the 3D pose (position and orientation) of detected tags
-- Publishes detected tag poses as `AprilTagPoseArray` messages
+This package provides ROS 2 nodes that:
+- Subscribe to camera image and camera info topics
+- Detect AprilTags (Tag36h11 family) in the image
+- Estimate the 3D pose (position and orientation) of detected tags
+- Publish detected tag poses as `SharedControlGoalArray` messages for shared control applications
+- Transform detected poses to a target frame (e.g., robot base_link) using TF2
 
 ## Features
 
@@ -17,6 +18,8 @@ This package provides a ROS 2 node that:
 - Configurable tag sizes and detection parameters
 - Supports USB camera integration via usb_cam
 - Flexible topic remapping for different camera setups
+- TF2-based pose transformation to target frames
+- Composable node architecture for efficient processing
 
 ## Dependencies
 
@@ -26,7 +29,12 @@ This package provides a ROS 2 node that:
 - Eigen3
 - cv_bridge
 - sensor_msgs
+- geometry_msgs
+- tf2
+- tf2_ros
+- tf2_geometry_msgs
 - rclcpp
+- rclcpp_components
 - usb_cam (for camera input)
 - extender_msgs (custom message types)
 
@@ -50,12 +58,13 @@ source install/setup.bash
 Run the complete detection pipeline with USB camera input:
 
 ```bash
-ros2 launch apriltag_detector detection.launch.py
+ros2 launch apriltag_detector explorer_camera_detection.launch.py
 ```
 
 This will:
-1. Start the USB camera node (configured for `/dev/video4` with calibration from `explorer_camera_calib.yaml`)
+1. Start the USB camera node (configured for `/dev/video0` with calibration from `explorer_camera_calib.yaml`)
 2. Start the AprilTag detector node
+3. Start the AprilTag bridge node for pose transformation
 
 ### Run detector only
 
@@ -69,23 +78,22 @@ ros2 run apriltag_detector apriltag_detector
 
 ### AprilTag Detector Config
 
-Configure the detector in `config/apriltag_detector.yaml`:
+Configure the detector in `config/tags_params.yaml`:
 
 ```yaml
 apriltag_detector:
   ros__parameters:
     max_hamming_distance: 1          # Maximum Hamming distance for detection
-    tag_publisher_topic: "/tag_detections"  # Output topic
     tag_sizes:
-      0: 0.1                         # Tag ID: size in meters
-      1: 0.1
-      2: 0.15
+      "0": 0.024                     # Tag ID: size in meters
+      "1": 0.024
+      "2": 0.024
+      # ... up to tag ID 9
 ```
 
 Parameters:
 - `max_hamming_distance`: Maximum acceptable Hamming distance for tag detection (higher = more permissive)
 - `tag_sizes.<tag_id>`: Physical size of each tag in meters (required for pose estimation)
-- `tag_publisher_topic`: Topic where detected tag poses are published
 
 ## Topics
 

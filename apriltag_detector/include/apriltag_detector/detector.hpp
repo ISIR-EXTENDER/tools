@@ -3,8 +3,8 @@
 #include <string>
 #include <unordered_map>
 
-#include "extender_msgs/msg/april_tag_pose_array.hpp"
-#include "extender_msgs/msg/april_tag_pose.hpp"
+#include "extender_msgs/msg/shared_control_goal_array.hpp"
+#include "extender_msgs/msg/shared_control_goal.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/image.hpp"
@@ -18,7 +18,6 @@
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-
 
 #include <Eigen/Dense>
 
@@ -45,9 +44,7 @@ namespace vision_tools
     bool has_camera_info_ = false;
     double fx_, fy_, cx_, cy_;
 
-    std::string tag_publisher_topic_;
-
-    rclcpp::Publisher<extender_msgs::msg::AprilTagPoseArray>::SharedPtr tag_publisher_;
+    rclcpp::Publisher<extender_msgs::msg::SharedControlGoalArray>::SharedPtr tag_publisher_;
     rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr image_sub_;
     rclcpp::Subscription<sensor_msgs::msg::CameraInfo>::SharedPtr camera_info_sub_;
 
