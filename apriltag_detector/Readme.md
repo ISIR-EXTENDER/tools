@@ -95,6 +95,24 @@ Parameters:
 - `max_hamming_distance`: Maximum acceptable Hamming distance for tag detection (higher = more permissive)
 - `tag_sizes.<tag_id>`: Physical size of each tag in meters (required for pose estimation)
 
+### AprilTag Bridge Config
+
+The bridge node transforms detected tag poses to a target frame. Configure in the launch file:
+
+```python
+ComposableNode(
+    package='apriltag_detector',
+    plugin='vision_tools::AprilTagBridge',
+    name='apriltag_bridge',
+    parameters=[{
+        'target_frame': 'base_link'  # Target frame for pose transformation
+    }],
+)
+```
+
+Parameters:
+- `target_frame`: The TF2 frame to transform poses into (e.g., 'base_link')
+
 ## Topics
 
 ### Subscriptions
@@ -104,20 +122,19 @@ Parameters:
 
 ### Publications
 
-- `/tag_detections` (extender_msgs/AprilTagPoseArray): Array of detected tags with their 3D poses
+- `/tag_detections` (extender_msgs/SharedControlGoalArray): Array of detected tags with their 3D poses (detector node)
+- `/shared_control/dynamic_goals` (extender_msgs/SharedControlGoalArray): Array of detected tags transformed to target frame (bridge node)
 
 ## Message Structure
 
-The detector publishes `AprilTagPoseArray` messages containing:
+The detector publishes `SharedControlGoalArray` messages containing:
 
 ```
-detected_tags: AprilTagPose[]
+goals: SharedControlGoal[]
   id: int32                  # AprilTag ID
-  tag_pose: geometry_msgs/PoseStamped
-    header: Header
-      frame_id: str
-      stamp: Time
-    pose: Pose
-      position: Point (x, y, z)
-      orientation: Quaternion (x, y, z, w)
+  goal_pose: geometry_msgs/Pose
+    position: Point (x, y, z)
+    orientation: Quaternion (x, y, z, w)
 ```
+
+The bridge node transforms these poses to the target frame and republishes them.
