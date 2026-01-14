@@ -19,34 +19,48 @@ namespace vision_tools
     image_sub_ = this->create_subscription<sensor_msgs::msg::Image>(
         "/image_raw", 10, std::bind(&AprilTagDetector::imageCallback, this, std::placeholders::_1));
 
-    tag_publisher_ = this->create_publisher<extender_msgs::msg::SharedControlGoalArray>(
-        "/tag_detections", 10);
+    tag_publisher_ =
+        this->create_publisher<extender_msgs::msg::SharedControlGoalArray>("/tag_detections", 10);
 
     this->get_parameter("max_hamming_distance", max_hamming_distance_);
 
     std::string prefix = "tag_sizes";
-    auto list_result = this->list_parameters({prefix}, 10);
+    auto overrides = this->get_node_parameters_interface()->get_parameter_overrides();
 
-    for (const auto &name : list_result.names)
+    for (auto const &[name, rcl_value] : overrides)
     {
-      std::string id_str = name.substr(prefix.length() + 1);
-      try
+      if (name.compare(0, prefix.size(), prefix) == 0)
       {
-        if (!this->has_parameter(name))
+        // Extract the ID (the part after "tag_sizes.")
+        std::string id_str = name.substr(prefix.size());
+
+        try
         {
-          this->declare_parameter(name, rclcpp::ParameterType::PARAMETER_DOUBLE);
+          if (!this->has_parameter(name))
+          {
+            this->declare_parameter(name, rcl_value.get_type());
+          }
+
+          double size_value = this->get_parameter(name).as_double();
+          int tag_id = std::stoi(id_str.substr(1)); // Skip the dot
+
+          tag_sizes_[tag_id] = size_value;
+          RCLCPP_INFO(this->get_logger(), "Successfully loaded Tag ID: %d, Size: %f meters", tag_id,
+                      size_value);
         }
-
-        double size_value = this->get_parameter(name).as_double();
-        int tag_id = std::stoi(id_str);
-
-        tag_sizes_[tag_id] = size_value;
-        RCLCPP_INFO(this->get_logger(), "Loaded Tag ID: %d, Size: %f meters", tag_id, size_value);
+        catch (const std::exception &e)
+        {
+          RCLCPP_ERROR(this->get_logger(), "Failed to parse tag parameter '%s': %s", name.c_str(),
+                       e.what());
+        }
       }
-      catch (const std::exception &e)
-      {
-        RCLCPP_ERROR(this->get_logger(), "Error loading parameter %s: %s", name.c_str(), e.what());
-      }
+    }
+
+    // Check if we actually loaded anything
+    if (tag_sizes_.empty())
+    {
+      RCLCPP_WARN(this->get_logger(),
+                  "No tag_sizes were loaded from YAML. Check the node name and YAML indentation.");
     }
   }
 
@@ -107,8 +121,9 @@ namespace vision_tools
       err = estimate_tag_pose(&info, &pose);
 
       Eigen::Map<Eigen::Vector3d> translation(pose.t->data);
-      Eigen::Map<Eigen::Matrix<double, 3, 3, Eigen::RowMajor>> rotation(pose.R->data);
+      Eigen::Map<Eigen::Matrix<double, 3, 3, Eigen::ColumnMajor>> rotation(pose.R->data);
       Eigen::Quaterniond q(rotation);
+      q.normalize();
 
       extender_msgs::msg::SharedControlGoal detection_msg;
       detection_msg.id = det->id;
