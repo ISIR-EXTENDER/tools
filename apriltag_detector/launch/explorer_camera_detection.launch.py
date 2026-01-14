@@ -22,12 +22,12 @@ def generate_launch_description():
             ComposableNode(
                 package='usb_cam',
                 plugin='usb_cam::UsbCamNode',
-                name='explorer_camera',
+                name='camera_explorer',
                 parameters=[
-                    {'camera_name': 'explorer_camera'},
-                    {'video_device': '/dev/video0'},
+                    {'camera_name': 'camera_explorer'},
+                    {'video_device': '/dev/video4'},
                     {'camera_info_url': usb_cam_info_url},
-                    {'frame_id': 'camera'}
+                    {'frame_id': 'camera_explorer'}
                 ],
                 extra_arguments=[{'use_intra_process_comms': True}]
             ),
@@ -38,7 +38,9 @@ def generate_launch_description():
                 plugin='vision_tools::AprilTagDetector',
                 name='apriltag_detector',
                 parameters=[apriltag_config_file],
-                extra_arguments=[{'use_intra_process_comms': True}]
+                extra_arguments=[{'use_intra_process_comms': True},
+                                 {'allow_undeclared_parameters': True},
+                                 {'automatically_declare_parameters_from_overrides': True}]
             ),
 
             # 3. Goal Bridge Component
