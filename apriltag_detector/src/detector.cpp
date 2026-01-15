@@ -121,7 +121,7 @@ namespace vision_tools
       err = estimate_tag_pose(&info, &pose);
 
       Eigen::Map<Eigen::Vector3d> translation(pose.t->data);
-      Eigen::Map<Eigen::Matrix<double, 3, 3, Eigen::ColumnMajor>> rotation(pose.R->data);
+      Eigen::Map<Eigen::Matrix<double, 3, 3, Eigen::RowMajor>> rotation(pose.R->data);
       Eigen::Quaterniond q(rotation);
       q.normalize();
 
