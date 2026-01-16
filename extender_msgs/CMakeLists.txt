@@ -14,6 +14,8 @@ find_package(rosidl_default_generators REQUIRED)
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/TeleopCommand.msg"
   "msg/JointPositionCommand.msg"
+  "msg/SharedControlGoal.msg"
+  "msg/SharedControlGoalArray.msg"
   DEPENDENCIES geometry_msgs std_msgs
 )
 

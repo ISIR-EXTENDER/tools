@@ -4,14 +4,32 @@ A collection of utility packages for the extender robot control framework, provi
 
 ## Packages
 
+### apriltag_detector
+**Package**: `apriltag_detector`
+
+Real-time AprilTag detection and 3D pose estimation from camera feeds. Uses the apriltag library to detect Tag36h11 family tags and compute their position and orientation.
+
+**Features**:
+- AprilTag detection from image streams
+- 3D pose estimation using camera intrinsics
+- Configurable tag sizes and detection parameters
+- Integration with USB camera for easy deployment
+- Publishes detected tag poses as `AprilTagPoseArray` messages
+
+**Topics**:
+- Subscribes: `/image_raw`, `/camera_info`
+- Publishes: on a topic defined by a parameter.
+
 ### extender_msgs
 **Package**: `extender_msgs`
 
-ROS2 message definitions for the extender framework. Defines custom message types for teleoperation commands and joint position control.
+ROS2 message definitions for the extender framework. Defines custom message types for teleoperation commands, joint control, and vision-based applications.
 
 **Messages**:
 - `TeleopCommand`: Teleoperation commands with velocity and mode selection
 - `JointPositionCommand`: Joint position commands with named joint targeting
+- `AprilTagPose`: Single AprilTag detection with pose information
+- `AprilTagPoseArray`: Collection of detected AprilTag poses
 
 ### mediapipe_mocap
 **Package**: `mediapipe_mocap`
@@ -29,8 +47,12 @@ Motion capture using Google MediaPipe. Detects and tracks landmarks from RGB cam
 Simulated camera stream publisher for testing and development. Publishes images or video files as camera topics without requiring physical cameras.
 
 **Components**:
-- `image_publisher`: Publishes static images or image sequences
-- `video_publisher`: Publishes video files with configurable playback
+- `video_publisher`: Publishes video files as camera topics with configurable playback
+
+### replay_joint_positions
+**Package**: `replay_joint_positions`
+
+Utility for replaying recorded joint position trajectories. Useful for testing controllers and reproducing robot motions from recorded data.
 
 ## Dependencies
 
@@ -39,6 +61,14 @@ Simulated camera stream publisher for testing and development. Publishes images 
 - Python 3
 
 ### Package-Specific Dependencies
+
+**apriltag_detector**:
+- OpenCV
+- apriltag
+- Eigen3
+- cv_bridge
+- sensor_msgs
+- usb_cam (optional, for camera input)
 
 **mediapipe_mocap**:
 - MediaPipe

@@ -8,6 +8,7 @@ The `extender_msgs` package contains ROS2 message definitions used throughout th
 
 - **Teleoperation Commands**: Structured messages for robot teleoperation with mode selection
 - **Joint Position Commands**: Messages for direct joint-space position control
+- **Shared Control Goals**: Messages for representing detected goals (e.g., from AprilTags) in shared control scenarios
 - **Standardized Interfaces**: Consistent message formats across different controllers and interfaces
 
 ## Messages
@@ -42,16 +43,39 @@ A message for commanding specific joint positions by name.
 - Joint names must match those defined in the robot's URDF
 - Positions must be within joint limits
 
+### SharedControlGoal
+
+A message representing a single shared control goal, typically corresponding to a detected object or target pose.
+
+**Fields**:
+
+- **`id`** (`int32`): Unique identifier of the goal (e.g., AprilTag ID)
+- **`goal_pose`** (`geometry_msgs/Pose`): 3D pose of the goal
+  - `position`: 3D position (x, y, z) in meters
+  - `orientation`: Quaternion (x, y, z, w) representing goal orientation
+
+### SharedControlGoalArray
+
+A collection of shared control goals with timestamp information.
+
+**Fields**:
+
+- **`header`** (`std_msgs/Header`): Standard ROS header with timestamp and frame information
+- **`goal_array`** (`extender_msgs/SharedControlGoal[]`): Array of shared control goals
+
+**Usage**: Used for publishing arrays of detected goals from perception pipelines, such as AprilTag detection for shared control applications
+
 ## Installation
 
-1. Clone the package into your ROS2 workspace:
+1. Ensure the package is in your ROS2 workspace:
    ```bash
-   cd ~/ros2_ws/src
-   git clone <repository-url>
+   cd ~/ros2_humble_ws/src/extender_workspace/tools
+   # extender_msgs should be present here
    ```
 
 2. Build the workspace:
    ```bash
+   cd ~/ros2_humble_ws
    colcon build --packages-select extender_msgs
    ```
 
