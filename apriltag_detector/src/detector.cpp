@@ -22,6 +22,8 @@ namespace vision_tools
     tag_publisher_ =
         this->create_publisher<extender_msgs::msg::SharedControlGoalArray>("/tag_detections", 10);
 
+    tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
+
     this->get_parameter("max_hamming_distance", max_hamming_distance_);
 
     std::string prefix = "tag_sizes";
@@ -124,6 +126,24 @@ namespace vision_tools
       Eigen::Map<Eigen::Matrix<double, 3, 3, Eigen::RowMajor>> rotation(pose.R->data);
       Eigen::Quaterniond q(rotation);
       q.normalize();
+
+      geometry_msgs::msg::TransformStamped t;
+
+      t.header.stamp = msg->header.stamp;
+      t.header.frame_id = msg->header.frame_id; 
+
+      t.child_frame_id = "tag_" + std::to_string(det->id);
+
+      t.transform.translation.x = translation.x();
+      t.transform.translation.y = translation.y();
+      t.transform.translation.z = translation.z();
+
+      t.transform.rotation.x = q.x();
+      t.transform.rotation.y = q.y();
+      t.transform.rotation.z = q.z();
+      t.transform.rotation.w = q.w();
+
+      tf_broadcaster_->sendTransform(t);
 
       extender_msgs::msg::SharedControlGoal detection_msg;
       detection_msg.id = det->id;
