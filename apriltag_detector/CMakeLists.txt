@@ -44,6 +44,7 @@ ament_target_dependencies(apriltag_detector_component
   extender_msgs
   cv_bridge
   apriltag
+  tf2_ros
 )
 
 target_link_libraries(apriltag_detector_component
