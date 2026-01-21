@@ -2,9 +2,9 @@ apriltag_detector:
   ros__parameters:
     max_hamming_distance: 1
     tag_sizes:
-      "0": 0.024
-      "1": 0.024
-      "2": 0.024
+      "0": 0.075
+      "1": 0.075
+      "2": 0.024 
       "3": 0.024
       "4": 0.024
       "5": 0.024
