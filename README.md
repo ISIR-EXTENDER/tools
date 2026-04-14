@@ -4,6 +4,16 @@ A collection of utility packages for the extender robot control framework, provi
 
 ## Packages
 
+### dynamic_parameters_identification
+**Package**: `dynamic_parameters_identification`
+
+Dynamic parameters identification pipeline (trajectories generation and parameters identification). Works only for manipulators.
+
+**Features**:
+- Generates non synchronized sinusoids trajectories for each joints.
+- Record and replay data in order to identify parameters via Weighted Least Square estimation.
+- Saves the parameters in a *.npy file in order to re-use them.
+
 ### apriltag_detector
 **Package**: `apriltag_detector`
 

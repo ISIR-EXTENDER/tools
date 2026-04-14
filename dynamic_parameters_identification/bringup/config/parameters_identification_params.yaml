@@ -1,0 +1,14 @@
+parameters_identification:
+  ros__parameters:
+    joint_names:
+      - joint_1
+      - joint_2
+      - joint_3
+      - joint_4
+      - joint_5
+      - joint_6
+      - joint_7
+    downsample_factor: 1
+    static_only: false
+    max_samples: 70000
+    urdf_path: '/home/megane/ros2_humble_ws/src/ros2_kortex/kortex_description/robots/gen3.urdf'
