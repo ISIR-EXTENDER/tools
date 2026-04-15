@@ -1,0 +1,12 @@
+joint_sine_trajectory:
+  ros__parameters:
+    joint_names:
+      - joint_1
+      - joint_2
+      - joint_3
+      - joint_4
+      - joint_5
+      - joint_6
+      - joint_7
+    frequencies: [0.1, 0.13, 0.22, 0.2, 0.18, 0.08, 0.15]
+    amplitudes: [0.1, 0.7, 0.1, 0.1, 0.1, 0.1, 0.1]
