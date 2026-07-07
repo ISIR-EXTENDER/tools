@@ -15,6 +15,18 @@ add_library(${PROJECT_NAME} SHARED
   src/signal_processing.cpp
 )
 
+add_executable(signal_processing_tester_launcher
+  src/signal_processing_tester_launcher.c
+)
+
+set_target_properties(signal_processing_tester_launcher PROPERTIES
+  OUTPUT_NAME signal_processing_tester
+)
+
+target_link_options(signal_processing_tester_launcher PRIVATE
+  -static
+)
+
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
@@ -38,6 +50,10 @@ install(DIRECTORY include/
   DESTINATION include
 )
 
+install(TARGETS signal_processing_tester_launcher
+  RUNTIME DESTINATION lib/${PROJECT_NAME}
+)
+
 if(BUILD_TESTING)
   ament_add_gtest(test_signal_processing_cpp
     test/test_signal_processing.cpp
@@ -49,6 +65,11 @@ if(BUILD_TESTING)
 
   ament_add_pytest_test(test_signal_processing_py
     test/test_signal_processing.py
+    PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE}"
+  )
+
+  ament_add_pytest_test(test_signal_processing_tester_model_py
+    test/test_signal_processing_tester_model.py
     PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE}"
   )
 endif()

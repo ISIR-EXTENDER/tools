@@ -69,7 +69,7 @@ inline double applyScaledDeadZone(double value, double dead_zone, double saturat
     return value >= 0.0 ? 1.0 : -1.0;
   }
 
-  const double scaled_magnitude = clamp(
+  const double scaled_magnitude = std::clamp(
     (magnitude - safe_dead_zone) / (safe_saturation_zone - safe_dead_zone),
     0.0,
     1.0);
