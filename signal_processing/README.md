@@ -13,7 +13,7 @@ Build this package from the workspace root, not from the package directory:
 
 ```bash
 cd /home/emoullet/dev/extender_workspace
-source /opt/ros/humble/setup.bash
+source /opt/ros/$ROS_DISTRO/setup.bash
 colcon build --symlink-install --packages-select signal_processing
 source install/setup.bash
 ```
