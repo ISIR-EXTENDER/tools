@@ -1,0 +1,81 @@
+cmake_minimum_required(VERSION 3.8)
+project(signal_processing)
+
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
+find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_gtest REQUIRED)
+find_package(ament_cmake_pytest REQUIRED)
+find_package(ament_cmake_python REQUIRED)
+find_package(Eigen3 REQUIRED)
+
+add_library(${PROJECT_NAME} SHARED
+  src/signal_processing.cpp
+)
+
+add_executable(signal_processing_tester_launcher
+  src/signal_processing_tester_launcher.c
+)
+
+set_target_properties(signal_processing_tester_launcher PROPERTIES
+  OUTPUT_NAME signal_processing_tester
+)
+
+target_link_options(signal_processing_tester_launcher PRIVATE
+  -static
+)
+
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
+
+target_include_directories(${PROJECT_NAME} PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+
+target_link_libraries(${PROJECT_NAME}
+  Eigen3::Eigen
+)
+
+ament_python_install_package(${PROJECT_NAME})
+
+install(TARGETS ${PROJECT_NAME}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+
+install(DIRECTORY include/
+  DESTINATION include
+)
+
+install(TARGETS signal_processing_tester_launcher
+  RUNTIME DESTINATION lib/${PROJECT_NAME}
+)
+
+if(BUILD_TESTING)
+  ament_add_gtest(test_signal_processing_cpp
+    test/test_signal_processing.cpp
+  )
+  target_link_libraries(test_signal_processing_cpp
+    ${PROJECT_NAME}
+    Eigen3::Eigen
+  )
+
+  ament_add_pytest_test(test_signal_processing_py
+    test/test_signal_processing.py
+    PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE}"
+  )
+
+  ament_add_pytest_test(test_signal_processing_tester_model_py
+    test/test_signal_processing_tester_model.py
+    PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE}"
+  )
+endif()
+
+ament_export_include_directories(include)
+ament_export_libraries(${PROJECT_NAME})
+ament_export_dependencies(Eigen3)
+
+ament_package()

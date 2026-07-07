@@ -16,6 +16,7 @@
   <exec_depend>cv_bridge</exec_depend>
   <exec_depend>python3-opencv</exec_depend>
   <exec_depend>python3-numpy</exec_depend>
+  <exec_depend>signal_processing</exec_depend>
 
   <!-- MediaPipe and DepthAI are pip-installed for this package. -->
   <exec_depend>mediapipe</exec_depend>

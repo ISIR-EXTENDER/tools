@@ -1,4 +1,3 @@
-import math
 import os
 import platform
 import sys
@@ -6,6 +5,9 @@ from typing import Iterable, Sequence
 
 from geometry_msgs.msg import Point32
 import numpy as np
+from signal_processing import clamp, limit_norm, OneEuroFilter as _SignalProcessingOneEuroFilter
+
+OneEuroFilter = _SignalProcessingOneEuroFilter
 
 
 # MediaPipe hand landmark graph edges (21 landmarks)
@@ -108,10 +110,6 @@ def ensure_3_tuple(values: Iterable[float], fallback, logger=None, parameter_nam
     return (float(values[0]), float(values[1]), float(values[2]))
 
 
-def clamp(value: float, lo: float, hi: float) -> float:
-    return max(lo, min(hi, value))
-
-
 def saturate_axis(value: float, saturation: float) -> float:
     saturation = max(float(saturation), 1e-9)
     return clamp(float(value) / saturation, -1.0, 1.0)
@@ -119,19 +117,18 @@ def saturate_axis(value: float, saturation: float) -> float:
 
 def saturate_vector_norm(point: Point32, saturation: float) -> Point32:
     saturation = max(float(saturation), 1e-9)
-    norm = math.sqrt(
-        float(point.x) * float(point.x)
-        + float(point.y) * float(point.y)
-        + float(point.z) * float(point.z)
+    x, y, z = limit_norm(
+        (
+            float(point.x) / saturation,
+            float(point.y) / saturation,
+            float(point.z) / saturation,
+        ),
+        1.0,
     )
-    if norm <= 1e-12:
-        return Point32(x=0.0, y=0.0, z=0.0)
-
-    scale = min(norm / saturation, 1.0) / norm
     return Point32(
-        x=float(point.x) * scale,
-        y=float(point.y) * scale,
-        z=float(point.z) * scale,
+        x=x,
+        y=y,
+        z=z,
     )
 
 
@@ -282,43 +279,3 @@ def draw_reference_overlay(
             (0, 220, 255),
             2,
         )
-
-
-class OneEuroFilter:
-    """Simple scalar One Euro filter."""
-
-    def __init__(self, frequency: float = 30.0, mincutoff: float = 1.0, beta: float = 0.1):
-        self.frequency = float(frequency)
-        self.mincutoff = float(mincutoff)
-        self.beta = float(beta)
-        self.last_value = 0.0
-        self.last_derivative = 0.0
-        self.last_timestamp = -1.0
-
-    def reset(self):
-        self.last_value = 0.0
-        self.last_derivative = 0.0
-        self.last_timestamp = -1.0
-
-    def filter(self, value: float, timestamp_sec: float) -> float:  # noqa: A003
-        if self.last_timestamp < 0.0:
-            self.last_value = float(value)
-            self.last_derivative = 0.0
-            self.last_timestamp = float(timestamp_sec)
-            return float(value)
-
-        dt = float(timestamp_sec) - self.last_timestamp
-        if dt <= 0.0:
-            return self.last_value
-
-        derivative = (float(value) - self.last_value) / dt
-        cutoff = self.mincutoff + self.beta * abs(derivative)
-        alpha = cutoff / (cutoff + self.frequency)
-
-        filtered_value = alpha * float(value) + (1.0 - alpha) * self.last_value
-        filtered_derivative = alpha * derivative + (1.0 - alpha) * self.last_derivative
-
-        self.last_value = filtered_value
-        self.last_derivative = filtered_derivative
-        self.last_timestamp = float(timestamp_sec)
-        return filtered_value
