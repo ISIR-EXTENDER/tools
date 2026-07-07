@@ -12,6 +12,8 @@
 
   <depend>eigen</depend>
 
+  <exec_depend>python_qt_binding</exec_depend>
+
   <test_depend>ament_cmake_gtest</test_depend>
   <test_depend>ament_cmake_pytest</test_depend>
   <test_depend>ament_lint_auto</test_depend>
