@@ -18,11 +18,11 @@ def test_normalized_control_points_axis_mode():
     """Axis mode should clamp each axis independently to [-1, 1]."""
     points = [Point32(x=0.6, y=-0.2, z=0.03)]
 
-    normalized = normalized_control_points(points, (0.3, 0.1, 0.1), mode='axis')
+    normalized = normalized_control_points(points, 0.3, mode='axis')
 
     assert normalized[0].x == pytest.approx(1.0)
-    assert normalized[0].y == pytest.approx(-1.0)
-    assert normalized[0].z == pytest.approx(0.3)
+    assert normalized[0].y == pytest.approx(-2.0 / 3.0)
+    assert normalized[0].z == pytest.approx(0.1)
 
 
 def test_normalized_control_points_vector_mode():
@@ -32,7 +32,7 @@ def test_normalized_control_points_vector_mode():
         Point32(x=0.1, y=0.0, z=0.0),
     ]
 
-    normalized = normalized_control_points(points, (0.5, 0.5, 0.5), mode='vector')
+    normalized = normalized_control_points(points, 0.5, mode='vector')
 
     assert normalized[0].x == pytest.approx(0.6)
     assert normalized[0].y == pytest.approx(0.8)
