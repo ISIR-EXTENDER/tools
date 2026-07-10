@@ -29,6 +29,7 @@
  * Reference: Casiez, G., Roussel, N., & Vogel, D. (2012). 1€ Filter: A simple
  *   speed-based low-pass filter for noisy input in interactive systems.
  *   Proc. ACM CHI 2012.
+ * Algorithm overview and tuning examples: https://gery.casiez.net/1euro/
  */
 
 #include <array>
