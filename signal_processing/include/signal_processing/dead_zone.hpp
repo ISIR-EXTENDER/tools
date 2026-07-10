@@ -15,6 +15,7 @@
  */
 
 #include <cmath>
+#include <type_traits>
 
 #include <Eigen/Core>
 
@@ -32,9 +33,10 @@ namespace signal_processing
  * @param threshold  Dead-zone radius (absolute value is taken).
  * @return 0 inside the dead-zone, @p value outside.
  */
-inline double applyDeadZone(double value, double threshold)
+template <typename Scalar, typename = std::enable_if_t<std::is_floating_point_v<Scalar>>>
+inline Scalar applyDeadZone(Scalar value, double threshold)
 {
-  return std::abs(value) <= std::abs(threshold) ? 0.0 : value;
+  return std::abs(value) <= std::abs(threshold) ? static_cast<Scalar>(0) : value;
 }
 
 /**
@@ -53,7 +55,8 @@ inline double applyDeadZone(double value, double threshold)
  * @param saturation_zone Outer threshold above which the output saturates at ±1.
  * @return Scaled and dead-zoned signal in [-1, 1].
  */
-inline double applyScaledDeadZone(double value, double dead_zone, double saturation_zone)
+template <typename Scalar, typename = std::enable_if_t<std::is_floating_point_v<Scalar>>>
+inline Scalar applyScaledDeadZone(Scalar value, double dead_zone, double saturation_zone)
 {
   const double magnitude = std::abs(value);
   const double safe_dead_zone = std::abs(dead_zone);
@@ -61,12 +64,12 @@ inline double applyScaledDeadZone(double value, double dead_zone, double saturat
 
   if (magnitude <= safe_dead_zone)
   {
-    return 0.0;
+    return static_cast<Scalar>(0);
   }
 
   if (safe_saturation_zone - safe_dead_zone <= 1e-12)
   {
-    return value >= 0.0 ? 1.0 : -1.0;
+    return value >= static_cast<Scalar>(0) ? static_cast<Scalar>(1) : static_cast<Scalar>(-1);
   }
 
   const double scaled_magnitude = std::clamp(
@@ -74,7 +77,7 @@ inline double applyScaledDeadZone(double value, double dead_zone, double saturat
     0.0,
     1.0);
 
-  return std::copysign(scaled_magnitude, value);
+  return static_cast<Scalar>(std::copysign(scaled_magnitude, static_cast<double>(value)));
 }
 
 /**
@@ -146,16 +149,20 @@ inline typename Derived::PlainObject applyNormDeadZone(
   double dead_zone,
   double saturation_zone)
 {
-  const double norm = value.norm();
-  const double safe_dead_zone = std::abs(dead_zone);
-  const double safe_saturation_zone = std::max(std::abs(saturation_zone), safe_dead_zone);
+  using RealScalar = typename Eigen::NumTraits<typename Derived::Scalar>::Real;
 
-  if (norm <= safe_dead_zone || norm <= 1e-12)
+  const RealScalar norm = value.norm();
+  const RealScalar safe_dead_zone = static_cast<RealScalar>(std::abs(dead_zone));
+  const RealScalar safe_saturation_zone = std::max(
+    static_cast<RealScalar>(std::abs(saturation_zone)),
+    safe_dead_zone);
+
+  if (norm <= safe_dead_zone || norm <= static_cast<RealScalar>(1e-12))
   {
     return Derived::PlainObject::Zero(value.rows(), value.cols());
   }
 
-  const double scaled_norm = applyScaledDeadZone(norm, safe_dead_zone, safe_saturation_zone);
+  const RealScalar scaled_norm = applyScaledDeadZone(norm, safe_dead_zone, safe_saturation_zone);
   return (value / norm) * std::abs(scaled_norm);
 }
 
