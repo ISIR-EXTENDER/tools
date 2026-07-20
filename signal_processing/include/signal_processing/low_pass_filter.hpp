@@ -13,135 +13,138 @@
  * Provided helpers:
  *  - computeLowPassAlpha(): convert period+time-constant to an α coefficient.
  *  - exponentialSmoothing(): single-shot stateless application.
- *  - FirstOrderLowPassFilter<T>: stateful filter object for repeated calls.
+ *  - FirstOrderLowPassFilter: stateful scalar filter object for repeated calls.
+ *  - FirstOrderLowPassFilterVector: stateful Eigen::VectorXd filter object.
  *
- * All utilities are header-only and ROS-agnostic.  T must support arithmetic
- * operations compatible with scalar multiplication (e.g. double, Eigen vectors).
+ * All utilities are ROS-agnostic.
  */
 
-#include <type_traits>
-
-#include "signal_processing/saturation.hpp"
+#include <Eigen/Core>
 
 namespace signal_processing
 {
 
-/**
- * @brief Compute the smoothing coefficient α for a first-order low-pass filter.
- *
- * Uses the bilinear-equivalent formula:
- *   α = T / (T + τ)
- *
- * where T is the sample period and τ is the desired time constant.  The result
- * is clamped to [0, 1].  Returns 1.0 (no filtering) when either argument is
- * non-positive.
- *
- * @param sample_period   Sampling period T (seconds).
- * @param time_constant   Filter time constant τ (seconds).
- * @return α ∈ [0, 1].  Values close to 1 give fast response; close to 0 give heavy smoothing.
- */
-inline double computeLowPassAlpha(double sample_period, double time_constant)
-{
-  if (sample_period <= 0.0 || time_constant <= 0.0)
-  {
-    return 1.0;
-  }
-
-  return clamp(sample_period / (sample_period + time_constant), 0.0, 1.0);
-}
-
-/**
- * @brief Apply one step of exponential smoothing without maintaining state.
- *
- * Computes y = α * input + (1 − α) * previous, with α clamped to [0, 1].
- * Works with any type T that supports scalar-weighted addition.
- *
- * @tparam T      Value type (double, Eigen::Vector3d, etc.).
- * @param input    Current raw measurement x[n].
- * @param previous Previously filtered output y[n-1].
- * @param alpha    Filter coefficient α ∈ [0, 1].
- * @return Filtered value y[n].
- */
-template <typename T>
-inline T exponentialSmoothing(const T & input, const T & previous, double alpha)
-{
-  const double safe_alpha = clamp(alpha, 0.0, 1.0);
-  return static_cast<T>(safe_alpha * input + (1.0 - safe_alpha) * previous);
-}
-
-/**
- * @brief Stateful first-order low-pass filter.
- *
- * Maintains internal state across calls so consumers do not need to track
- * the previous filtered value themselves.
- *
- * The first call to filter() initialises the state to the input value
- * (warm-start) to avoid a large transient at startup.  Call reset() to
- * reinitialise before a new signal segment.
- *
- * Example usage:
- * @code
- *   FirstOrderLowPassFilter<Eigen::Vector3d> lpf;
- *   const double alpha = computeLowPassAlpha(0.01, 0.05); // T=10 ms, τ=50 ms
- *   for (const auto & sample : samples) {
- *     const auto smoothed = lpf.filter(sample, alpha);
- *   }
- * @endcode
- *
- * @tparam T  Value type.  Must support arithmetic with double scalars.
- */
-template <typename T>
-class FirstOrderLowPassFilter
-{
-public:
-  FirstOrderLowPassFilter() = default;
-
-  /// Reset internal state; the next filter() call will re-initialise.
-  void reset()
-  {
-    initialized_ = false;
-    state_ = T{};
-  }
-
-  /// Return the current internal (filtered) state.
-  const T & state() const
-  {
-    return state_;
-  }
-
-  /// Return true after the first call to filter() has initialised the state.
-  bool initialized() const
-  {
-    return initialized_;
-  }
+  /**
+   * @brief Compute the smoothing coefficient α for a first-order low-pass filter.
+   *
+   * Uses the bilinear-equivalent formula:
+   *   α = T / (T + τ)
+   *
+   * where T is the sample period and τ is the desired time constant.  The result
+   * is clamped to [0, 1].  Returns 1.0 (no filtering) when either argument is
+   * non-positive.
+   *
+   * @param sample_period   Sampling period T (seconds).
+   * @param time_constant   Filter time constant τ (seconds).
+   * @return α ∈ [0, 1].  Values close to 1 give fast response; close to 0 give heavy smoothing.
+   */
+  double computeLowPassAlpha(double sample_period, double time_constant);
 
   /**
-   * @brief Filter one sample.
+   * @brief Apply one step of exponential smoothing without maintaining state.
    *
-   * On the first call (not yet initialised) the state is set to @p input
-   * directly and returned unchanged.  Subsequent calls apply exponential
-   * smoothing with the supplied @p alpha.
-   *
-   * @param input  New raw sample x[n].
-   * @param alpha  Filter coefficient α ∈ [0, 1].
+   * Computes y = α * input + (1 − α) * previous, with α clamped to [0, 1].
+   * @param input    Current raw measurement x[n].
+   * @param previous Previously filtered output y[n-1].
+   * @param alpha    Filter coefficient α ∈ [0, 1].
    * @return Filtered value y[n].
    */
-  T filter(const T & input, double alpha)
+  double exponentialSmoothing(double input, double previous, double alpha);
+
+  /**
+   * @brief Apply one step of vector exponential smoothing without maintaining state.
+   *
+   * @param input    Current raw measurement x[n].
+   * @param previous Previously filtered output y[n-1].
+   * @param alpha    Filter coefficient α ∈ [0, 1].
+   * @return Filtered value y[n].
+   */
+  Eigen::VectorXd exponentialSmoothing(const Eigen::VectorXd &input,
+                                       const Eigen::VectorXd &previous, double alpha);
+
+  /**
+   * @brief Stateful first-order low-pass filter.
+   *
+   * Maintains internal state across calls so consumers do not need to track
+   * the previous filtered value themselves.
+   *
+   * The first call to filter() initialises the state to the input value
+   * (warm-start) to avoid a large transient at startup.  Call reset() to
+   * reinitialise before a new signal segment.
+   *
+   * Example usage:
+   * @code
+   *   FirstOrderLowPassFilter lpf;
+   *   const double alpha = computeLowPassAlpha(0.01, 0.05); // T=10 ms, τ=50 ms
+   *   for (const auto & sample : samples) {
+   *     const auto smoothed = lpf.filter(sample, alpha);
+   *   }
+   * @endcode
+   */
+  class FirstOrderLowPassFilter
   {
-    if (!initialized_)
-    {
-      state_ = input;
-      initialized_ = true;
-      return state_;
-    }
+  public:
+    FirstOrderLowPassFilter() = default;
 
-    state_ = exponentialSmoothing(input, state_, alpha);
-    return state_;
-  }
+    /// Reset internal state; the next filter() call will re-initialise.
+    void reset();
 
-private:
-  bool initialized_{false};
-  T state_{};
-};
+    /// Return the current internal (filtered) state.
+    double state() const;
 
-}  // namespace signal_processing
+    /// Return true after the first call to filter() has initialised the state.
+    bool initialized() const;
+
+    /**
+     * @brief Filter one sample.
+     *
+     * On the first call (not yet initialised) the state is set to @p input
+     * directly and returned unchanged.  Subsequent calls apply exponential
+     * smoothing with the supplied @p alpha.
+     *
+     * @param input  New raw sample x[n].
+     * @param alpha  Filter coefficient α ∈ [0, 1].
+     * @return Filtered value y[n].
+     */
+    double filter(double input, double alpha);
+
+  private:
+    bool initialized_{false};
+    double state_ = 0.0;
+  };
+
+  /**
+   * @brief Stateful first-order low-pass filter for Eigen::VectorXd signals.
+   */
+  class FirstOrderLowPassFilterVector
+  {
+  public:
+    FirstOrderLowPassFilterVector() = default;
+
+    /// Reset internal state; the next filter() call will re-initialise.
+    void reset();
+
+    /// Return the current internal (filtered) state.
+    const Eigen::VectorXd &state() const;
+
+    /// Return true after the first call to filter() has initialised the state.
+    bool initialized() const;
+
+    /**
+     * @brief Filter one vector sample.
+     *
+     * On the first call the state is set to @p input directly and returned
+     * unchanged. Subsequent calls apply exponential smoothing.
+     *
+     * @param input  New raw sample x[n].
+     * @param alpha  Filter coefficient α ∈ [0, 1].
+     * @return Filtered value y[n].
+     */
+    Eigen::VectorXd filter(const Eigen::VectorXd &input, double alpha);
+
+  private:
+    bool initialized_{false};
+    Eigen::VectorXd state_;
+  };
+
+} // namespace signal_processing
