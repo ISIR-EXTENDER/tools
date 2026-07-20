@@ -50,10 +50,6 @@ install(DIRECTORY include/
   DESTINATION include
 )
 
-install(TARGETS signal_processing_tester_launcher
-  RUNTIME DESTINATION lib/${PROJECT_NAME}
-)
-
 if(BUILD_TESTING)
   ament_add_gtest(test_signal_processing_cpp
     test/test_signal_processing.cpp
@@ -65,11 +61,6 @@ if(BUILD_TESTING)
 
   ament_add_pytest_test(test_signal_processing_py
     test/test_signal_processing.py
-    PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE}"
-  )
-
-  ament_add_pytest_test(test_signal_processing_tester_model_py
-    test/test_signal_processing_tester_model.py
     PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE}"
   )
 endif()
