@@ -36,11 +36,18 @@ def test_limit_norm_and_dead_zone():
     per_axis = apply_scaled_dead_zone_per_axis((0.05, -0.55, 2.0), 0.1, 1.0)
     assert per_axis == pytest.approx((0.0, -0.5, 1.0))
 
+    assert apply_scaled_dead_zone(-0.55, 0.1, 1.1, 10.0) == pytest.approx(-4.5)
+    per_axis_with_max = apply_scaled_dead_zone_per_axis((0.05, -0.55, 2.0), 0.1, 1.0, 2.0)
+    assert per_axis_with_max == pytest.approx((0.0, -1.0, 2.0))
+
     # Between dead-zone and saturation, the norm follows a linear ramp: (0.55 - 0.1) / 1.0.
     ramped = apply_norm_dead_zone((0.55, 0.0, 0.0), 0.1, 1.1)
     assert ramped[0] == pytest.approx(0.45)
     assert ramped[1] == pytest.approx(0.0)
     assert ramped[2] == pytest.approx(0.0)
+
+    ramped_to_max = apply_norm_dead_zone((0.55, 0.0, 0.0), 0.1, 1.1, 2.0)
+    assert ramped_to_max == pytest.approx((0.9, 0.0, 0.0))
 
 
 def test_low_pass_filter_state():
