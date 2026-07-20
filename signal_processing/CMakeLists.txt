@@ -12,19 +12,10 @@ find_package(ament_cmake_python REQUIRED)
 find_package(Eigen3 REQUIRED)
 
 add_library(${PROJECT_NAME} SHARED
-  src/signal_processing.cpp
-)
-
-add_executable(signal_processing_tester_launcher
-  src/signal_processing_tester_launcher.c
-)
-
-set_target_properties(signal_processing_tester_launcher PROPERTIES
-  OUTPUT_NAME signal_processing_tester
-)
-
-target_link_options(signal_processing_tester_launcher PRIVATE
-  -static
+  src/dead_zone.cpp
+  src/low_pass_filter.cpp
+  src/one_euro_filter.cpp
+  src/saturation.cpp
 )
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
