@@ -42,8 +42,12 @@ colcon build --symlink-install --packages-select signal_processing
 The first version includes:
 
 - one euro filtering
-- scalar and vector saturation helpers
+- scalar, vector, and conjoint velocity-twist saturation helpers
 - dead-zone helpers
 - first-order low-pass filtering helpers
+
+The generic `limitVelocityTwistNorm` helper accepts any copyable command with Eigen-like
+`linear` and `angular` fields. It enforces enabled norm limits with one shared scale, preserving
+the relationship between both parts without coupling this package to a ROS command type.
 
 The package stays ROS-agnostic at the algorithm layer so downstream packages can adapt the outputs to their own message types.

@@ -9,6 +9,7 @@
  *  - Component-wise symmetric clamping of Eigen vectors.
  *  - Per-axis rate limiting (delta clamping between successive samples).
  *  - Norm-based magnitude limiting for multi-dimensional vectors.
+ *  - Conjoint norm limiting for linear/angular velocity commands.
  *
  * All functions are ROS-agnostic.
  */
