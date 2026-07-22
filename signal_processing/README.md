@@ -41,10 +41,14 @@ colcon build --symlink-install --packages-select signal_processing
 
 The first version includes:
 
-- one euro filtering
 - scalar, vector, and conjoint velocity-twist saturation helpers
 - dead-zone helpers
+- one euro filtering
 - first-order low-pass filtering helpers
+
+## Filtering advice: 
+Go to https://gery.casiez.net/1euro/InteractiveDemo/ to have insights on the compared behaviour of usual filters (and the superiority of one euro filter...)
+
 
 The generic `limitVelocityTwistNorm` helper accepts any copyable command with Eigen-like
 `linear` and `angular` fields. It enforces enabled norm limits with one shared scale, preserving
