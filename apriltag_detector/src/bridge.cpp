@@ -9,6 +9,9 @@ namespace vision_tools
     // Declare and get parameters
     this->declare_parameter("target_frame", "base_link");
     target_frame_ = this->get_parameter("target_frame").as_string();
+    // cartesian_manager's shared-control goals: every tag seen so far, as one standard PoseArray.
+    const auto goals_topic = this->declare_parameter<std::string>("goals_topic", "/shared_control/goals");
+    goal_memory_ = GoalMemory(this->declare_parameter<double>("goal_timeout_sec", 0.0));
 
     // Initialize TF2 buffer and listener
     tf_buffer_ = std::make_shared<tf2_ros::Buffer>(this->get_clock());
@@ -20,6 +23,7 @@ namespace vision_tools
 
     goal_pub_ = this->create_publisher<extender_msgs::msg::SharedControlGoalArray>(
         "/shared_control/dynamic_goals", 10);
+    goal_set_pub_ = this->create_publisher<geometry_msgs::msg::PoseArray>(goals_topic, 10);
 
     RCLCPP_INFO(this->get_logger(), "AprilTag Bridge started. Transforming to: %s",
                 target_frame_.c_str());
@@ -30,6 +34,7 @@ namespace vision_tools
 
     if (msg->goal_array.empty())
     {
+      publishGoalSet(msg->header.stamp);
       return;
     }
     extender_msgs::msg::SharedControlGoalArray out_msg;
@@ -50,17 +55,28 @@ namespace vision_tools
 
         goal_msg.id = tag.id;
         goal_msg.goal_pose = transformed_pose;
+        goal_memory_.see(tag.id, transformed_pose, this->now().seconds());
 
         out_msg.goal_array.push_back(goal_msg);
       }
 
       goal_pub_->publish(out_msg);
+      publishGoalSet(msg->header.stamp);
     }
     catch (const tf2::TransformException &ex)
     {
       RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 1000,
                            "Could not transform goal: %s", ex.what());
     }
+  }
+
+  void AprilTagBridge::publishGoalSet(const builtin_interfaces::msg::Time &stamp)
+  {
+    geometry_msgs::msg::PoseArray goals;
+    goals.header.stamp = stamp;
+    goals.header.frame_id = target_frame_;
+    goals.poses = goal_memory_.poses(this->now().seconds());
+    goal_set_pub_->publish(goals);
   }
 } // namespace vision_tools
 

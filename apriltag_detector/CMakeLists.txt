@@ -96,4 +96,11 @@ install(DIRECTORY config launch
 )
 
 
+if(BUILD_TESTING)
+  find_package(ament_cmake_gtest REQUIRED)
+  ament_add_gtest(test_goal_memory test/test_goal_memory.cpp)
+  target_include_directories(test_goal_memory PRIVATE include)
+  ament_target_dependencies(test_goal_memory geometry_msgs)
+endif()
+
 ament_package()

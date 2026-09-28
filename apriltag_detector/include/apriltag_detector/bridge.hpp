@@ -2,6 +2,9 @@
 
 #include "extender_msgs/msg/shared_control_goal.hpp"
 #include "extender_msgs/msg/shared_control_goal_array.hpp"
+#include "geometry_msgs/msg/pose_array.hpp"
+
+#include "apriltag_detector/goal_memory.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 
@@ -20,6 +23,8 @@ namespace vision_tools
   private:
     rclcpp::Subscription<extender_msgs::msg::SharedControlGoalArray>::SharedPtr apriltag_sub_;
     rclcpp::Publisher<extender_msgs::msg::SharedControlGoalArray>::SharedPtr goal_pub_;
+    rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr goal_set_pub_;
+    GoalMemory goal_memory_;
 
     std::string target_frame_;
 
@@ -27,6 +32,7 @@ namespace vision_tools
     std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
 
     void tagCallback(const extender_msgs::msg::SharedControlGoalArray::SharedPtr msg);
+    void publishGoalSet(const builtin_interfaces::msg::Time &stamp);
   };
 
 } // namespace vision_tools

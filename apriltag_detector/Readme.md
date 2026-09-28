@@ -105,13 +105,17 @@ ComposableNode(
     plugin='vision_tools::AprilTagBridge',
     name='apriltag_bridge',
     parameters=[{
-        'target_frame': 'base_link'  # Target frame for pose transformation
+        'target_frame': 'base_link',  # Target frame for pose transformation
+        'goals_topic': '/shared_control/goals',
+        'goal_timeout_sec': 0.0,
     }],
 )
 ```
 
 Parameters:
 - `target_frame`: The TF2 frame to transform poses into (e.g., 'base_link')
+- `goals_topic`: Where the goal set for `cartesian_manager` is published (default `/shared_control/goals`)
+- `goal_timeout_sec`: Forget a tag unseen for this long; `0` keeps every tag seen since start (default)
 
 ## Topics
 
@@ -124,6 +128,7 @@ Parameters:
 
 - `/tag_detections` (extender_msgs/SharedControlGoalArray): Array of detected tags with their 3D poses (detector node)
 - `/shared_control/dynamic_goals` (extender_msgs/SharedControlGoalArray): Array of detected tags transformed to target frame (bridge node)
+- `/shared_control/goals` (geometry_msgs/PoseArray): Every tag seen so far, last known pose in the target frame, in tag id order (bridge node). This is the goal set `cartesian_manager`'s `behaviour/shared_control` reads; a tag hidden by the gripper on approach stays a goal, and each message replaces the set.
 
 ## Message Structure
 
