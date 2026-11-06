@@ -95,11 +95,12 @@ ros2 launch mediapipe_mocap oak_hand_landmarks_launch.py \
 ```
 
 The mirrored selfie view and mirrored horizontal control are enabled by default.
-Pass `selfie_mode:=false` to either OAK launch command to disable them. RGB and depth are flipped
-together before detection and depth sampling. Published X coordinates are
-mirrored as well, so the published frame name identifies a virtual mirrored
-camera frame rather than the physical optical frame. Use an appropriate
-`camera_frame_id` if downstream consumers rely on physical TF coordinates.
+Pass `selfie_mode:=false` to either OAK launch command to disable them. RGB and
+depth are flipped together before detection and depth sampling. Published X
+coordinates are reflected, although `camera_frame_id` still defaults to the
+physical optical frame name. A reflection cannot be represented by a ROS TF
+rotation: consumers needing physical optical-frame coordinates must undo the
+X reflection or disable selfie mode.
 
 For the producer and joystick consumer together:
 
@@ -140,12 +141,13 @@ and `frame_id`.
 ### OAK coordinates
 
 The OAK producer samples aligned depth near each MediaPipe landmark and
-back-projects it through the RGB intrinsics. A valid hand is a complete
+back-projects it through the RGB intrinsics (adjusted for reflection in selfie
+mode). A valid hand is a complete
 21-point metric result after applying the configured missing-depth policy.
 The published values are:
 
 ```text
-point = filtered RGB-camera metric point - metric reference
+point = filtered camera-based metric point - metric reference
 ```
 
 All three coordinates are in meters. The cloud is stamped when the synchronized
@@ -337,6 +339,7 @@ An omitted standalone launch argument uses the YAML value. The internal
 
 | Setting | Built-in | RGB YAML | OAK YAML |
 |---------|----------|----------|----------|
+| `selfie_mode` | RGB `false` / OAK `true` | `false` | `true` |
 | `visualize` | `false` | `true` | `true` |
 | `visualize_depth` | `false` (OAK only) | — | `false` |
 | `show_control_overlay` | `false` | `true` | `false` |
