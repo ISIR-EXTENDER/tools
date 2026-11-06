@@ -194,6 +194,7 @@ def test_oak_standalone_launch_uses_effective_yaml_defaults():
     assert parameters['fps'] == 50.0
     assert parameters['enable_one_euro_filter'] is True
     assert parameters['visualize'] is True
+    assert parameters['visualize_depth'] is False
     assert parameters['show_control_overlay'] is False
     assert parameters['auto_reference_on_first_detection'] is True
     assert 'running_mode' not in parameters
@@ -235,6 +236,7 @@ def test_terminal_overrides_win_without_starting_nodes():
             'rgb_width': '800',
             'rgb_height': '600',
             'visualize': 'false',
+            'visualize_depth': 'true',
             'show_control_overlay': 'true',
             'overlay_dead_zone': '0.08',
             'overlay_saturation_zone': '0.4',
@@ -251,6 +253,7 @@ def test_terminal_overrides_win_without_starting_nodes():
     assert parameters['rgb_width'] == 800
     assert parameters['rgb_height'] == 600
     assert parameters['visualize'] is False
+    assert parameters['visualize_depth'] is True
     assert parameters['show_control_overlay'] is True
     assert parameters['overlay_dead_zone'] == 0.08
     assert parameters['overlay_saturation_zone'] == 0.4

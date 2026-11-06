@@ -70,6 +70,7 @@ from mediapipe_mocap.reference import (
     ResetRequestResult,
 )
 from mediapipe_mocap.viewer import (
+    colorize_depth,
     ControlOverlayConfig,
     HandLandmarksViewer,
     parse_overlay_normalization_mode,
@@ -173,6 +174,8 @@ class OakHandLandmarksNode(Node):
             0.0,
             self._get_float('reset_reference_cooldown_sec'),
         )
+        self.visualize_depth = self._get_bool('visualize_depth')
+        self.depth_window_name = 'OAK Depth'
         self.visualize = self._get_bool('visualize')
         self.window_name = self._get_str('window_name')
         self.viewer = (
@@ -527,6 +530,16 @@ class OakHandLandmarksNode(Node):
                 interpolation=cv2.INTER_NEAREST,
             )
 
+        if self.visualize_depth:
+            depth_view = colorize_depth(
+                depth_mm, self.depth_config.min_depth_m, self.depth_config.max_depth_m
+            )
+            cv2.imshow(self.depth_window_name, depth_view)
+            key = cv2.waitKey(1)
+            if key in (27, ord('q')):
+                rclpy.shutdown()
+                return
+
         header = Header()
         header.stamp = self.get_clock().now().to_msg()
         header.frame_id = self.camera_frame_id
@@ -859,6 +872,11 @@ class OakHandLandmarksNode(Node):
             pass
         if self.viewer is not None:
             self.viewer.close()
+        if self.visualize_depth:
+            try:
+                cv2.destroyWindow(self.depth_window_name)
+            except Exception:
+                pass
         super().destroy_node()
 
 

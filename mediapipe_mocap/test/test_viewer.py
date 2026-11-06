@@ -276,3 +276,15 @@ def test_close_destroys_only_the_configured_window(monkeypatch):
     hand_viewer.close()
 
     assert calls['destroyWindow'] == [(('Hand Window',), {})]
+
+
+def test_colorize_depth_masks_invalid_and_preserves_fixed_scale():
+    """Render valid distances consistently and hide missing/out-of-range pixels."""
+    depth = np.array([[0, 100, 500, 1000, 1200]], dtype=np.uint16)
+    image = viewer.colorize_depth(depth, 0.1, 1.0)
+    assert image.shape == (1, 5, 3)
+    assert np.all(image[0, 0] == 0)
+    assert np.all(image[0, 4] == 0)
+    assert not np.array_equal(image[0, 1], image[0, 2])
+    assert not np.array_equal(image[0, 2], image[0, 3])
+    assert np.array_equal(image[0, 2], viewer.colorize_depth(depth[:, 2:3], 0.1, 1.0)[0, 0])

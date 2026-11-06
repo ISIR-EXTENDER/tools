@@ -55,6 +55,7 @@ def _create_node(context):
         ('rgb_width', 'rgb_width', int),
         ('rgb_height', 'rgb_height', int),
         ('visualize', 'visualize', _parse_bool),
+        ('visualize_depth', 'visualize_depth', _parse_bool),
         ('window_name', 'window_name', str),
         ('show_control_overlay', 'show_control_overlay', _parse_bool),
         ('overlay_dead_zone', 'overlay_dead_zone', float),
@@ -114,6 +115,11 @@ def generate_launch_description():
             'visualize',
             default_value=USE_YAML_DEFAULT,
             description='Override the YAML OpenCV visualization setting',
+        ),
+        DeclareLaunchArgument(
+            'visualize_depth',
+            default_value=USE_YAML_DEFAULT,
+            description='Override the YAML depth map visualization setting',
         ),
         DeclareLaunchArgument(
             'window_name',

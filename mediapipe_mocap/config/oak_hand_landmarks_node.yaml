@@ -42,6 +42,7 @@ oak_hand_landmarks_node:
     one_euro_beta: 0.1
     one_euro_derivative_cutoff: 1.0
 
+    visualize_depth: false
     visualize: true
     window_name: "3D Hand Landmarks OAK"
     show_control_overlay: false

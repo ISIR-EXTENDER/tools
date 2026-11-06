@@ -68,7 +68,10 @@ ros2 launch mediapipe_mocap oak_hand_landmarks_launch.py
 ```
 
 The shipped OAK configuration requests 640×400 RGB and aligned depth at
-50 FPS. Its viewer is enabled and the optional control overlay is disabled.
+50 FPS. Its RGB viewer is enabled; the depth viewer and control overlay are disabled.
+Set `visualize_depth:=true` to show the RGB-aligned depth map independently of
+`visualize`. Colors span `min_depth_m` to `max_depth_m`; invalid or out-of-range
+pixels are black. Press `q` or Escape in either viewer to stop the node.
 
 Common launch overrides are:
 
@@ -78,6 +81,7 @@ ros2 launch mediapipe_mocap oak_hand_landmarks_launch.py \
   rgb_width:=640 \
   rgb_height:=400 \
   visualize:=true \
+  visualize_depth:=true \
   show_control_overlay:=true \
   overlay_normalization_mode:=vector \
   landmark_index:=0
@@ -86,7 +90,7 @@ ros2 launch mediapipe_mocap oak_hand_landmarks_launch.py \
 For the producer and joystick consumer together:
 
 ```bash
-ros2 launch hand_joystick_interfaces oak_hand_joystick_launch.py
+ros2 launch hand_joystick_interfaces oak_hand_joystick_launch.py visualize_depth:=true
 ```
 
 ## Published data contract
@@ -280,6 +284,7 @@ coordinates. For OAK, it is measured in meters.
 | `sync_threshold_ms` | `15.0` ms | Maximum RGB/depth synchronization offset |
 | `sync_attempts` | `-1` | DepthAI synchronization attempt policy |
 | `sync_run_on_host` | `true` | Run RGB/depth synchronization on the host |
+| `visualize_depth` | `false` | Show a colorized depth map in a separate window |
 | `depth_sample_radius_px` | `2` px | Sampling radius around each landmark |
 | `min_depth_m` | `0.12` m | Minimum accepted depth |
 | `max_depth_m` | `3.0` m | Maximum accepted depth |

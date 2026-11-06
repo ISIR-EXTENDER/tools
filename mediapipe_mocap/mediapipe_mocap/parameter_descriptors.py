@@ -414,6 +414,11 @@ def oak_hand_landmarks_parameter_declarations(
             'Maximum missing direct-depth samples accepted in one 21-point hand.',
             integer_range=(0, 21),
         ),
+        _parameter(
+            'visualize_depth',
+            False,
+            'Open a colorized aligned depth map in a separate OpenCV window.',
+        ),
         *_viewer_parameters(
             '3D Hand Landmarks OAK',
             metric_overlay=True,
