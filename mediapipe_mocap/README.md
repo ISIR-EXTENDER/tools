@@ -72,6 +72,13 @@ The shipped OAK configuration requests 640×400 RGB and aligned depth at
 Set `visualize_depth:=true` to show the RGB-aligned depth map independently of
 `visualize`. Colors span `min_depth_m` to `max_depth_m`; invalid or out-of-range
 pixels are black. Press `q` or Escape in either viewer to stop the node.
+The depth window requires a graphical desktop and shows the aligned depth image,
+not a ROS image topic. To display only depth, use:
+
+```bash
+ros2 launch mediapipe_mocap oak_hand_landmarks_launch.py \
+  visualize:=false visualize_depth:=true
+```
 
 Common launch overrides are:
 
@@ -331,6 +338,7 @@ An omitted standalone launch argument uses the YAML value. The internal
 | Setting | Built-in | RGB YAML | OAK YAML |
 |---------|----------|----------|----------|
 | `visualize` | `false` | `true` | `true` |
+| `visualize_depth` | `false` (OAK only) | — | `false` |
 | `show_control_overlay` | `false` | `true` | `false` |
 | Filter enabled | `true` | `true` | `true` |
 | Nominal filter frequency | RGB 30 Hz / OAK `fps` | 30 Hz | 50 Hz |
