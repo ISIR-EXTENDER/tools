@@ -87,6 +87,13 @@ ros2 launch mediapipe_mocap oak_hand_landmarks_launch.py \
   landmark_index:=0
 ```
 
+The mirrored selfie view and mirrored horizontal control are enabled by default.
+Pass `selfie_mode:=false` to either OAK launch command to disable them. RGB and depth are flipped
+together before detection and depth sampling. Published X coordinates are
+mirrored as well, so the published frame name identifies a virtual mirrored
+camera frame rather than the physical optical frame. Use an appropriate
+`camera_frame_id` if downstream consumers rely on physical TF coordinates.
+
 For the producer and joystick consumer together:
 
 ```bash
@@ -269,6 +276,7 @@ coordinates. For OAK, it is measured in meters.
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
+| `selfie_mode` | `true` | Mirror RGB, depth, and horizontal hand coordinates |
 | `camera_frame_id` | `oak_rgb_camera_optical_frame` | Published cloud frame |
 | `rgb_width` | `640` px | Aligned RGB/depth width |
 | `rgb_height` | `400` px | Aligned RGB/depth height |

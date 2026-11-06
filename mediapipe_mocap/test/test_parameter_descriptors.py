@@ -62,6 +62,7 @@ RGB_PARAMETER_NAMES = {
 }
 
 OAK_PARAMETER_NAMES = {
+    'selfie_mode',
     'landmarks_topic',
     'model_path',
     'num_hands',
@@ -104,6 +105,7 @@ OAK_PARAMETER_NAMES = {
     'one_euro_beta',
     'one_euro_derivative_cutoff',
     'visualize',
+    'visualize_depth',
     'window_name',
 }
 

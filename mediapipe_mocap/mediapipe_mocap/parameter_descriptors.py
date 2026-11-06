@@ -294,6 +294,10 @@ def oak_hand_landmarks_parameter_declarations(
     return [
         *_landmarker_parameters(default_model_path),
         _parameter(
+            'selfie_mode', True,
+            'Mirror RGB and depth horizontally; published X uses mirrored coordinates.',
+        ),
+        _parameter(
             'camera_frame_id',
             'oak_rgb_camera_optical_frame',
             'RGB optical camera frame assigned to published PointCloud headers.',

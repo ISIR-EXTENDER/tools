@@ -8,6 +8,7 @@ oak_hand_landmarks_node:
     min_tracking_confidence: 0.5
     delegate: "AUTO"  # Options: AUTO, CPU, GPU
 
+    selfie_mode: true  # Mirror RGB, depth, and the published horizontal coordinate
     camera_frame_id: "oak_rgb_camera_optical_frame"
     rgb_width: 640
     rgb_height: 400

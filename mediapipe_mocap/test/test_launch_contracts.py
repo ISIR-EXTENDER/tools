@@ -189,6 +189,7 @@ def test_oak_standalone_launch_uses_effective_yaml_defaults():
     assert node.node_package == _PACKAGE_NAME
     assert parameters['landmarks_topic'] == '/hand_landmarks'
     assert parameters['camera_frame_id'] == 'oak_rgb_camera_optical_frame'
+    assert parameters['selfie_mode'] is True
     assert parameters['rgb_width'] == 640
     assert parameters['rgb_height'] == 400
     assert parameters['fps'] == 50.0
@@ -233,6 +234,7 @@ def test_terminal_overrides_win_without_starting_nodes():
         'oak_hand_landmarks_launch.py',
         {
             'fps': '42.0',
+            'selfie_mode': 'false',
             'rgb_width': '800',
             'rgb_height': '600',
             'visualize': 'false',
@@ -249,6 +251,7 @@ def test_terminal_overrides_win_without_starting_nodes():
         context,
     )
 
+    assert parameters['selfie_mode'] is False
     assert parameters['fps'] == 42.0
     assert parameters['rgb_width'] == 800
     assert parameters['rgb_height'] == 600

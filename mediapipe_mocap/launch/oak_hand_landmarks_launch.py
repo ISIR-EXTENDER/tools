@@ -52,6 +52,7 @@ def _create_node(context):
     overrides = {}
     for argument_name, parameter_name, value_type in (
         ('fps', 'fps', float),
+        ('selfie_mode', 'selfie_mode', _parse_bool),
         ('rgb_width', 'rgb_width', int),
         ('rgb_height', 'rgb_height', int),
         ('visualize', 'visualize', _parse_bool),
@@ -95,6 +96,11 @@ def generate_launch_description():
             'oak_config_file',
             default_value=config_file,
             description='Path to the OAK producer YAML parameter file',
+        ),
+        DeclareLaunchArgument(
+            'selfie_mode',
+            default_value=USE_YAML_DEFAULT,
+            description='Mirror RGB, depth, and horizontal hand coordinates',
         ),
         DeclareLaunchArgument(
             'fps',
