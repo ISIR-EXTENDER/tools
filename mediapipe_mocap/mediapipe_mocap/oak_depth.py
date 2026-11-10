@@ -103,6 +103,11 @@ class CameraIntrinsics:
         )
 
 
+    def mirrored_horizontally(self, width: int) -> CameraIntrinsics:
+        """Return intrinsics for a horizontally reflected image."""
+        return CameraIntrinsics(self.fx, self.fy, width - 1 - self.cx, self.cy)
+
+
 @dataclass(frozen=True)
 class DepthProcessingConfig:
     """Sampling limits and missing-depth behavior for one OAK stream."""

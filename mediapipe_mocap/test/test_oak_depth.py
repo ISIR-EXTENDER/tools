@@ -323,3 +323,14 @@ def test_invalid_strategy_falls_back_to_reuse_last():
         "Invalid missing_depth_strategy 'unknown', "
         "falling back to 'reuse_last'."
     ]
+
+
+def test_mirrored_intrinsics_reflect_horizontal_metric_coordinate():
+    """An off-center principal point must mirror along with depth pixels."""
+    intrinsics = CameraIntrinsics(fx=100.0, fy=110.0, cx=3.0, cy=2.0)
+    mirrored = intrinsics.mirrored_horizontally(10)
+    original_x = (2.0 - intrinsics.cx) / intrinsics.fx
+    mirrored_x = (7.0 - mirrored.cx) / mirrored.fx
+    assert mirrored.cx == 6.0
+    assert mirrored_x == -original_x
+    assert mirrored.cy == intrinsics.cy

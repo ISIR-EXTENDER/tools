@@ -189,11 +189,13 @@ def test_oak_standalone_launch_uses_effective_yaml_defaults():
     assert node.node_package == _PACKAGE_NAME
     assert parameters['landmarks_topic'] == '/hand_landmarks'
     assert parameters['camera_frame_id'] == 'oak_rgb_camera_optical_frame'
+    assert parameters['selfie_mode'] is True
     assert parameters['rgb_width'] == 640
     assert parameters['rgb_height'] == 400
     assert parameters['fps'] == 50.0
     assert parameters['enable_one_euro_filter'] is True
     assert parameters['visualize'] is True
+    assert parameters['visualize_depth'] is False
     assert parameters['show_control_overlay'] is False
     assert parameters['auto_reference_on_first_detection'] is True
     assert 'running_mode' not in parameters
@@ -232,9 +234,11 @@ def test_terminal_overrides_win_without_starting_nodes():
         'oak_hand_landmarks_launch.py',
         {
             'fps': '42.0',
+            'selfie_mode': 'false',
             'rgb_width': '800',
             'rgb_height': '600',
             'visualize': 'false',
+            'visualize_depth': 'true',
             'show_control_overlay': 'true',
             'overlay_dead_zone': '0.08',
             'overlay_saturation_zone': '0.4',
@@ -247,10 +251,12 @@ def test_terminal_overrides_win_without_starting_nodes():
         context,
     )
 
+    assert parameters['selfie_mode'] is False
     assert parameters['fps'] == 42.0
     assert parameters['rgb_width'] == 800
     assert parameters['rgb_height'] == 600
     assert parameters['visualize'] is False
+    assert parameters['visualize_depth'] is True
     assert parameters['show_control_overlay'] is True
     assert parameters['overlay_dead_zone'] == 0.08
     assert parameters['overlay_saturation_zone'] == 0.4

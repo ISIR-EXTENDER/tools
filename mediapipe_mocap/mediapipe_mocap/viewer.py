@@ -111,6 +111,18 @@ class ControlOverlayConfig:
         )
 
 
+def colorize_depth(depth_mm, min_depth_m, max_depth_m):
+    """Colorize the configured depth range; invalid pixels are black."""
+    min_mm = min_depth_m * 1000.0
+    max_mm = max_depth_m * 1000.0
+    valid = np.isfinite(depth_mm) & (depth_mm >= min_mm) & (depth_mm <= max_mm)
+    scaled = np.zeros(depth_mm.shape, dtype=np.uint8)
+    scaled[valid] = (255.0 * (depth_mm[valid] - min_mm) / (max_mm - min_mm)).astype(np.uint8)
+    colored = cv2.applyColorMap(scaled, cv2.COLORMAP_TURBO)
+    colored[~valid] = 0
+    return colored
+
+
 class HandLandmarksViewer:
     """Render hand-landmark diagnostics and manage one OpenCV window."""
 

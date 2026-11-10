@@ -70,6 +70,7 @@ from mediapipe_mocap.reference import (
     ResetRequestResult,
 )
 from mediapipe_mocap.viewer import (
+    colorize_depth,
     ControlOverlayConfig,
     HandLandmarksViewer,
     parse_overlay_normalization_mode,
@@ -121,6 +122,7 @@ class OakHandLandmarksNode(Node):
         self.model_path = self._get_str('model_path') or default_model_path
         self.num_hands = max(1, self._get_int('num_hands'))
         self.camera_frame_id = self._get_str('camera_frame_id')
+        self.selfie_mode = self._get_bool('selfie_mode')
         self.rgb_resolution = (
             max(1, self._get_int('rgb_width')),
             max(1, self._get_int('rgb_height')),
@@ -173,6 +175,8 @@ class OakHandLandmarksNode(Node):
             0.0,
             self._get_float('reset_reference_cooldown_sec'),
         )
+        self.visualize_depth = self._get_bool('visualize_depth')
+        self.depth_window_name = 'OAK Depth'
         self.visualize = self._get_bool('visualize')
         self.window_name = self._get_str('window_name')
         self.viewer = (
@@ -464,6 +468,8 @@ class OakHandLandmarksNode(Node):
             self.rgb_resolution[1],
         )
         intrinsics = CameraIntrinsics.from_matrix(intrinsics_matrix)
+        if self.selfie_mode:
+            intrinsics = intrinsics.mirrored_horizontally(self.rgb_resolution[0])
         self.depth_projector = OakDepthProjector(
             intrinsics,
             self.depth_config,
@@ -526,6 +532,20 @@ class OakHandLandmarksNode(Node):
                 (cv_bgr.shape[1], cv_bgr.shape[0]),
                 interpolation=cv2.INTER_NEAREST,
             )
+
+        if self.selfie_mode:
+            cv_bgr = cv2.flip(cv_bgr, 1)
+            depth_mm = cv2.flip(depth_mm, 1)
+
+        if self.visualize_depth:
+            depth_view = colorize_depth(
+                depth_mm, self.depth_config.min_depth_m, self.depth_config.max_depth_m
+            )
+            cv2.imshow(self.depth_window_name, depth_view)
+            key = cv2.waitKey(1)
+            if key in (27, ord('q')):
+                rclpy.shutdown()
+                return
 
         header = Header()
         header.stamp = self.get_clock().now().to_msg()
@@ -859,6 +879,11 @@ class OakHandLandmarksNode(Node):
             pass
         if self.viewer is not None:
             self.viewer.close()
+        if self.visualize_depth:
+            try:
+                cv2.destroyWindow(self.depth_window_name)
+            except Exception:
+                pass
         super().destroy_node()
 
 

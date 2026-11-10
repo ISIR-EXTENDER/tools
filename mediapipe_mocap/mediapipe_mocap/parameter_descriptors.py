@@ -294,6 +294,10 @@ def oak_hand_landmarks_parameter_declarations(
     return [
         *_landmarker_parameters(default_model_path),
         _parameter(
+            'selfie_mode', True,
+            'Mirror RGB and depth horizontally; published X uses mirrored coordinates.',
+        ),
+        _parameter(
             'camera_frame_id',
             'oak_rgb_camera_optical_frame',
             'RGB optical camera frame assigned to published PointCloud headers.',
@@ -413,6 +417,11 @@ def oak_hand_landmarks_parameter_declarations(
             8,
             'Maximum missing direct-depth samples accepted in one 21-point hand.',
             integer_range=(0, 21),
+        ),
+        _parameter(
+            'visualize_depth',
+            False,
+            'Open a colorized aligned depth map in a separate OpenCV window.',
         ),
         *_viewer_parameters(
             '3D Hand Landmarks OAK',

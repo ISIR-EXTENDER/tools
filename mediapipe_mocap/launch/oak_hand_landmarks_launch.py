@@ -52,9 +52,11 @@ def _create_node(context):
     overrides = {}
     for argument_name, parameter_name, value_type in (
         ('fps', 'fps', float),
+        ('selfie_mode', 'selfie_mode', _parse_bool),
         ('rgb_width', 'rgb_width', int),
         ('rgb_height', 'rgb_height', int),
         ('visualize', 'visualize', _parse_bool),
+        ('visualize_depth', 'visualize_depth', _parse_bool),
         ('window_name', 'window_name', str),
         ('show_control_overlay', 'show_control_overlay', _parse_bool),
         ('overlay_dead_zone', 'overlay_dead_zone', float),
@@ -96,6 +98,11 @@ def generate_launch_description():
             description='Path to the OAK producer YAML parameter file',
         ),
         DeclareLaunchArgument(
+            'selfie_mode',
+            default_value=USE_YAML_DEFAULT,
+            description='Mirror RGB, depth, and horizontal hand coordinates',
+        ),
+        DeclareLaunchArgument(
             'fps',
             default_value=USE_YAML_DEFAULT,
             description='Override the YAML OAK camera FPS',
@@ -114,6 +121,11 @@ def generate_launch_description():
             'visualize',
             default_value=USE_YAML_DEFAULT,
             description='Override the YAML OpenCV visualization setting',
+        ),
+        DeclareLaunchArgument(
+            'visualize_depth',
+            default_value=USE_YAML_DEFAULT,
+            description='Override the YAML depth map visualization setting',
         ),
         DeclareLaunchArgument(
             'window_name',
