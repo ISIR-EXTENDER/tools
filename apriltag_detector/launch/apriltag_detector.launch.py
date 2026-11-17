@@ -9,7 +9,6 @@ def generate_launch_description():
 
     # Config file paths
     apriltag_config_file = os.path.join(pkg_share, 'config', 'tags_params.yaml')
-    usb_cam_info_url = 'file://' + os.path.join(pkg_share, 'config', 'explorer_camera_calib.yaml')
 
     container = ComposableNodeContainer(
         name='vision_container',
@@ -19,18 +18,18 @@ def generate_launch_description():
         composable_node_descriptions=[
             
             # 1. USB Camera Component
-            ComposableNode(
-                package='usb_cam',
-                plugin='usb_cam::UsbCamNode',
-                name='camera_explorer',
-                parameters=[
-                    {'camera_name': 'camera_explorer'},
-                    {'video_device': '/dev/video2'},
-                    {'camera_info_url': usb_cam_info_url},
-                    {'frame_id': 'camera_explorer'}
-                ],
-                extra_arguments=[{'use_intra_process_comms': True}]
-            ),
+            #ComposableNode(
+            #    package='usb_cam',
+            #    plugin='usb_cam::UsbCamNode',
+            #    name='camera_explorer',
+            #    parameters=[
+            #        {'camera_name': 'camera_explorer'},
+            #        {'video_device': '/dev/video2'},
+            #        {'camera_info_url': usb_cam_info_url},
+            #        {'frame_id': 'camera_explorer'}
+            #    ],
+            #    extra_arguments=[{'use_intra_process_comms': True}]
+            #),
 
             # 2. AprilTag Detector Component
             ComposableNode(
@@ -49,7 +48,8 @@ def generate_launch_description():
                 plugin='vision_tools::AprilTagBridge',
                 name='apriltag_bridge',
                 parameters=[{
-                    'target_frame': 'base_link' 
+                    'target_frame': 'base_link',
+                    'base_frame': 'camera_link'
                 }],
                 extra_arguments=[{'use_intra_process_comms': True}]
             ),

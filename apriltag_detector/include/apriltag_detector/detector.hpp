@@ -38,9 +38,16 @@ namespace vision_tools
     zarray_t *detections_ = nullptr;
     apriltag_detection_t *det = nullptr;
     apriltag_detection_info_t info;
+    cv::VideoCapture cap_;
 
     std::unordered_map<int, double> tag_sizes_;
     int max_hamming_distance_;
+    int camera_id_;
+    std::string video_flow_by_;
+    std::string topic_kinova_vision_camera_info_;
+    std::string topic_kinova_vision_image_raw_;
+    std::string topic_usb_cam_camera_info_;
+    std::string topic_usb_cam_image_raw_;
 
     cv::Mat current_frame_;
 
@@ -52,8 +59,21 @@ namespace vision_tools
     rclcpp::Subscription<sensor_msgs::msg::CameraInfo>::SharedPtr camera_info_sub_;
 
     void imageCallback(const sensor_msgs::msg::Image::SharedPtr msg);
-    void cameraInfoCallback(const sensor_msgs::msg::CameraInfo::SharedPtr msg);
+    void cameraInfoCallback(const sensor_msgs::msg::CameraInfo msg);
 
     std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+
+      // USB_cam flux
+    void imageDirectCallback(
+      cv::VideoCapture &cap,
+      //const sensor_msgs::msg::Image &image_pub,
+      //const sensor_msgs::msg::CameraInfo &camera_info_pub,
+      const std::string &frame_id);
+    
+    rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr image_pub_;
+    rclcpp::Publisher<sensor_msgs::msg::CameraInfo>::SharedPtr camera_info_pub_;
+    void cameraInit();
+    rclcpp::TimerBase::SharedPtr timer_;
+    void timer_callback();
   };
 } // namespace vision_tools
